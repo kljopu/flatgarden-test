@@ -15,6 +15,7 @@ async function bootstrap() {
   app.enableCors();
 
   app.use(express.static(join(process.cwd(), '../client/dist/')));
+
   await app.listen(3000);
 }
 bootstrap();

@@ -7,6 +7,7 @@ import { AppResolver } from './app/app.resolver';
 import { AppService } from './app/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeormConfig } from './shared/util/typeOrmConfig';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -47,7 +48,8 @@ import { typeormConfig } from './shared/util/typeOrmConfig';
         };
       },
     }),
+    AuthModule
   ],
   providers: [AppService, BoardService, AppResolver],
 })
-export class AppModule {}
+export class AppModule { }

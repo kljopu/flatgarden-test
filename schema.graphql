@@ -23,9 +23,49 @@ type User {
   updatedAt: DateTime!
   deletedAt: DateTime
   name: String!
+  email: String!
+  password: String!
   boards: [Board!]!
+}
+
+type AuthLoginOutput {
+  error: String
+  ok: Boolean!
+  access_token: String
+}
+
+type UserOutPut {
+  user: User
+}
+
+type CreateUserOutput {
+  error: String
+  ok: Boolean!
 }
 
 type Query {
   hello(data: String): String!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): CreateUserOutput!
+  getMyProfile(input: UserProfileInput!): UserOutPut!
+  editMyProfile(userId: Float!, input: UserProfileInput!): UserOutPut!
+  login(input: AuthLoginInput!): AuthLoginOutput!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UserProfileInput {
+  email: String!
+  name: String!
+}
+
+input AuthLoginInput {
+  email: String!
+  password: String!
 }
