@@ -6,6 +6,7 @@ import { UserProfileInput, UserProfileOutput } from "./dtos/user.profile.dto"
 import { LoginInput, LoginOutput } from "./dtos/login.dto"
 import { User } from './user.model';
 import { UserOutPut } from 'src/auth/dtos/auth-login.dto';
+import { CommonOutPut } from 'src/shared/dtos/output.dto';
 
 @Injectable()
 export class UserService {
@@ -15,7 +16,7 @@ export class UserService {
   ) {
     console.log('use this repository user', User);
   }
-  async createAccount({ name, email, password }: CreateUserInput)
+  async createUser({ name, email, password }: CreateUserInput)
     : Promise<CreateUserOutput> {
     try {
       const existingUser = await this.users.findOne({ email })
@@ -63,25 +64,26 @@ export class UserService {
     }
   }
 
-  async findById(id: number): Promise<UserOutPut> {
+  async findById(id: number): Promise<User> {
     try {
-      const user = await this.users.findOneOrFail({ id });
+      console.log("id", id);
+      const user: User = await this.users.findOneOrFail({ id });
       if (!user) {
         throw new NotFoundException(`USER NOT FOUND ${id}`)
       }
-      return { user }
+      return user
     } catch (error) {
       throw new InternalServerErrorException('INTERNAL SERVER ERROR')
     }
   }
 
-  async findByEmail(email: string): Promise<UserOutPut> {
+  async findByEmail(email: string): Promise<User> {
     try {
       const user: User = await this.users.findOne({ email: email })
       if (!user) {
-        throw new NotFoundException()
+        throw new NotFoundException(`USER NOT FOUND ${email}`)
       }
-      return { user }
+      return user
     } catch (error) {
       console.log(error);
       throw new BadRequestException()
@@ -89,7 +91,7 @@ export class UserService {
   }
 
   //Profile Options
-  async getProfile(email: any): Promise<UserOutPut> {
+  async getProfile(email: any): Promise<User> {
     try {
       const user = await this.findByEmail(email)
       return user
@@ -106,15 +108,28 @@ export class UserService {
       if (email) {
         if (name) {
           // input email, name
-          user.user.name = name
+          user.name = name
         }
         // input email
-        user.user.email = email
+        user.email = email
       }
-      await this.users.save(user.user)
-      return user
+      await this.users.save(user)
+      return { user }
     } catch (error) {
       throw new InternalServerErrorException('CAN NOT UPDATE PROFILE')
+    }
+  }
+
+  async deleteUser(userId: number): Promise<CommonOutPut> {
+    try {
+      const user = await this.findById(userId)
+      console.log(user);
+      this.users.softDelete(user.id)
+      return {
+        ok: true
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('INTERNAL SERVER ERROR')
     }
   }
 }

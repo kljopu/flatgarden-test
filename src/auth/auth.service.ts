@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, NotFoundException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, NotFoundException, BadRequestException } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import { JwtService } from "@nestjs/jwt"
 
@@ -11,24 +11,24 @@ export class AuthService {
 
     async validateUser(email: string, password: string): Promise<any> {
         const user = await this.userService.findByEmail(email)
-        const isValidate = await user.user.checkPassword(password)
+        const isValidate = await user.checkPassword(password)
         if (!user) {
-            return new NotFoundException('USER NOT FOUND')
+            throw new NotFoundException('USER NOT FOUND')
         } else {
             if (!isValidate) {
-                return {
-                    ok: false,
-                }
+                throw new BadRequestException('PASSWORD NOT MATCHED')
             }
+            return user
         }
-        return user
     }
 
     async login(user: any) {
         try {
-            console.log(user);
+            if (!user) {
+                return new UnauthorizedException("UNAUTHORIZED")
+            }
             const payload = { username: user.name, sub: user.id }
-            console.log(payload);
+            console.log("login payload", payload);
             return {
                 ok: true,
                 access_token: this.jwtService.sign(payload)

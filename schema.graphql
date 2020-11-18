@@ -28,6 +28,11 @@ type User {
   boards: [Board!]!
 }
 
+type CommonOutPut {
+  error: String
+  ok: Boolean!
+}
+
 type AuthLoginOutput {
   error: String
   ok: Boolean!
@@ -43,6 +48,16 @@ type CreateUserOutput {
   ok: Boolean!
 }
 
+type BoardOutput {
+  boards: [Board!]
+}
+
+type BoardDefaultOutput {
+  error: String
+  ok: Boolean!
+  boards: Board!
+}
+
 type Query {
   hello(data: String): String!
 }
@@ -51,6 +66,12 @@ type Mutation {
   createUser(input: CreateUserInput!): CreateUserOutput!
   getMyProfile(input: UserProfileInput!): UserOutPut!
   editMyProfile(userId: Float!, input: UserProfileInput!): UserOutPut!
+  deleteUser: CommonOutPut!
+  createBoard(input: BoardCreateInput!): BoardDefaultOutput!
+  getAllBoards: BoardOutput!
+  editMyBoard(input: BoardEditInput!): BoardDefaultOutput!
+  deleteMyBoard(boardId: Float!): CommonOutPut!
+  getBoards: BoardOutput!
   login(input: AuthLoginInput!): AuthLoginOutput!
 }
 
@@ -62,7 +83,18 @@ input CreateUserInput {
 
 input UserProfileInput {
   email: String!
-  name: String!
+  name: String
+}
+
+input BoardCreateInput {
+  title: String!
+  content: String!
+}
+
+input BoardEditInput {
+  id: Float!
+  title: String!
+  content: String!
 }
 
 input AuthLoginInput {

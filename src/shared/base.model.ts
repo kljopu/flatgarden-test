@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @ObjectType({ isAbstract: true })
@@ -20,7 +21,7 @@ export abstract class BaseModel {
   @Field((_) => Date)
   updatedAt!: Date;
 
-  @Column({ nullable: true })
+  @DeleteDateColumn({ nullable: true })
   @Field((_) => Date, { nullable: true })
   deletedAt?: Date;
 }

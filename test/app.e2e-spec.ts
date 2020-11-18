@@ -4,7 +4,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import { AppModule } from '../src/app.module';
+import { UserModule } from 'src/user/user.module';
 import request from 'supertest';
+import { UserService } from 'src/user/user.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -13,7 +15,10 @@ describe('AppController (e2e)', () => {
     config({ path: resolve(__dirname, `../.${process.env.NODE_ENV}.env`) });
     console.log(process.env.NODE_ENV);
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, UserModule],
+      providers: [
+        UserService
+      ]
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -32,12 +37,18 @@ describe('AppController (e2e)', () => {
 
   it('user create', () => {
     const name = 'hakhak';
+    const email = 'junsu@gmail.com'
     return request(app.getHttpServer())
       .post('/graphql')
-      .send({ query: `mutation {createUser(name: "${name}"){name}}` })
+      .send({
+        query: `mutation {
+          createUser(input:{email: "${email}", password: "hakhak", name: "${name}"})
+            {ok,error}}`})
       .expect(200)
       .expect(({ body }) => {
-        expect(body.data.createUser.name).toBe(name);
+        console.log(body.data.createUser);
+        expect(body.data.createUser.ok).toBe(true);
+        expect(body.data.createUser.error).toBe(null)
       });
   });
 
