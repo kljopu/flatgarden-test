@@ -1,4 +1,4 @@
-import { InputType, Field, PickType, ObjectType, PartialType } from "@nestjs/graphql";
+import { InputType, Field, PickType, ObjectType } from "@nestjs/graphql";
 import { User } from "../../user/user.model"
 import { CommonOutPut } from "src/shared/dtos/output.dto";
 
@@ -16,6 +16,3 @@ export class UserOutPut {
     @Field(type => User, { nullable: true })
     user: User
 }
-
-// @Field(type => User, { nullable: true },)
-//     user?: User; extends PickType(User, ['email', 'id'])

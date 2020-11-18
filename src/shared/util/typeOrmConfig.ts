@@ -15,5 +15,5 @@ export const typeormConfig: PostgresConnectionOptions = {
   database: 'testdb',
   synchronize: true,
   entities: [`${path.join(__dirname, '..', '..', '**')}/*.model.[tj]s`],
-  host: "localhost",
+  host: 'localhost',
 };

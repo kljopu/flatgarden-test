@@ -66,7 +66,6 @@ export class UserService {
 
   async findById(id: number): Promise<User> {
     try {
-      console.log("id", id);
       const user: User = await this.users.findOneOrFail({ id });
       if (!user) {
         throw new NotFoundException(`USER NOT FOUND ${id}`)
@@ -77,24 +76,24 @@ export class UserService {
     }
   }
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<any> {
     try {
       const user: User = await this.users.findOne({ email: email })
       if (!user) {
-        throw new NotFoundException(`USER NOT FOUND ${email}`)
+        return { ok: false, error: `USER NOT FOUN ${email}` }
       }
       return user
     } catch (error) {
       console.log(error);
-      throw new BadRequestException()
+      throw new BadRequestException('hahahah')
     }
   }
 
   //Profile Options
-  async getProfile(email: any): Promise<User> {
+  async getProfile(email: any): Promise<UserOutPut> {
     try {
       const user = await this.findByEmail(email)
-      return user
+      return { user }
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('INTERNAL SERVER ERROR')
@@ -105,17 +104,20 @@ export class UserService {
     try {
       const { email, name } = data
       const user = await this.findById(userId)
+      console.log("user", user);
       if (email) {
+        // input email
         if (name) {
-          // input email, name
           user.name = name
         }
-        // input email
         user.email = email
+      } else if (name) {
+        user.name = name
       }
       await this.users.save(user)
       return { user }
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('CAN NOT UPDATE PROFILE')
     }
   }

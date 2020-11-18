@@ -11,10 +11,10 @@ export class AuthService {
 
     async validateUser(email: string, password: string): Promise<any> {
         const user = await this.userService.findByEmail(email)
-        const isValidate = await user.checkPassword(password)
-        if (!user) {
+        if (user.ok == false) {
             throw new NotFoundException('USER NOT FOUND')
         } else {
+            const isValidate = await user.checkPassword(password)
             if (!isValidate) {
                 throw new BadRequestException('PASSWORD NOT MATCHED')
             }
@@ -27,7 +27,7 @@ export class AuthService {
             if (!user) {
                 return new UnauthorizedException("UNAUTHORIZED")
             }
-            const payload = { username: user.name, sub: user.id }
+            const payload = { userId: user.id }
             console.log("login payload", payload);
             return {
                 ok: true,

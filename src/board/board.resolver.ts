@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { Board } from './board.model';
 import { BoardService } from './board.service';
 import { UserService } from 'src/user/user.service';
@@ -23,6 +23,7 @@ export class BoardResolver {
         @Args('input') input: BoardCreateInput,
         @GqlUser() user: any
     ): Promise<BoardDefaultOutput> {
+        console.log(user);
         const author = await this.userService.findById(user.userId)
         return this.boadService.createBoard(author, input)
     }
@@ -56,6 +57,7 @@ export class BoardResolver {
     async getBoards(
         @GqlUser() user: any
     ): Promise<BoardOutput> {
+        console.log(user);
         return this.boadService.getBoards(user.userId)
     }
 }

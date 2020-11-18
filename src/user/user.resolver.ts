@@ -35,8 +35,10 @@ export class UserResolver {
     @UseGuards(JwtAuthGuard)
     @Mutation(returns => UserOutPut)
     async editMyProfile(
-        @Args('input') input: UserProfileInput, @Args('userId') userId: number): Promise<UserOutPut> {
-        return this.userService.editProfile(input, userId)
+        @Args('input') input: UserProfileInput,
+        @GqlUser() user: any
+    ): Promise<UserOutPut> {
+        return this.userService.editProfile(input, user.userId)
     }
 
     @UseGuards(JwtAuthGuard)

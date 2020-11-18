@@ -42,7 +42,6 @@ export class BoardService {
   async getAllBoards(): Promise<BoardOutput> {
     try {
       const boards = await this.boards.find({ relations: ['author'] })
-      console.log(boards);
       return { boards }
     } catch (error) {
       console.log(error); 'INTERNAL SERVER ERROR'
@@ -54,7 +53,6 @@ export class BoardService {
     try {
       const { id, title, content } = input
       const user = await this.userService.findById(userId)
-      console.log(user);
       const board = await this.boards.findOne({ id: id, author: user }, { relations: ['author'] })
       if (!board) {
         throw new NotFoundException(`NOT FOUND BOARD AT id: ${id}`)

@@ -65,7 +65,7 @@ type Query {
 type Mutation {
   createUser(input: CreateUserInput!): CreateUserOutput!
   getMyProfile(input: UserProfileInput!): UserOutPut!
-  editMyProfile(userId: Float!, input: UserProfileInput!): UserOutPut!
+  editMyProfile(input: UserProfileInput!): UserOutPut!
   deleteUser: CommonOutPut!
   createBoard(input: BoardCreateInput!): BoardDefaultOutput!
   getAllBoards: BoardOutput!
@@ -82,7 +82,7 @@ input CreateUserInput {
 }
 
 input UserProfileInput {
-  email: String!
+  email: String
   name: String
 }
 
