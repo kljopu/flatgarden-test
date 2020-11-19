@@ -34,7 +34,6 @@ export class AuthService {
                 access_token: this.jwtService.sign(payload)
             }
         } catch (error) {
-            console.log("error", error);
             throw new UnauthorizedException()
         }
     }

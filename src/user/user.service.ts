@@ -28,7 +28,6 @@ export class UserService {
       );
       return { ok: true }
     } catch (error) {
-      console.log(error);
       return { ok: false, error: "ACCOUNT CREATION FAILD" }
     }
   }
@@ -40,7 +39,6 @@ export class UserService {
         { email },
         { select: ['id', 'password'] }
       )
-      console.log(user);
       if (!user) {
         return {
           ok: false,
@@ -56,7 +54,6 @@ export class UserService {
         }
       }
     } catch (error) {
-      console.log(error);
       return {
         ok: false,
         error: "LOGIN FAILD"
@@ -67,9 +64,6 @@ export class UserService {
   async findById(id: number): Promise<User> {
     try {
       const user: User = await this.users.findOneOrFail({ id });
-      if (!user) {
-        throw new NotFoundException(`USER NOT FOUND ${id}`)
-      }
       return user
     } catch (error) {
       throw new InternalServerErrorException('INTERNAL SERVER ERROR')
@@ -80,12 +74,11 @@ export class UserService {
     try {
       const user: User = await this.users.findOne({ email: email })
       if (!user) {
-        return { ok: false, error: `USER NOT FOUN ${email}` }
+        return { ok: false, error: `USER NOT FOUND EMAIL: ${email}` }
       }
       return user
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException('hahahah')
+      throw new InternalServerErrorException('INTERNAL SERVER ERROR')
     }
   }
 
@@ -95,7 +88,6 @@ export class UserService {
       const user = await this.findByEmail(email)
       return { user }
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException('INTERNAL SERVER ERROR')
     }
   }
@@ -104,7 +96,6 @@ export class UserService {
     try {
       const { email, name } = data
       const user = await this.findById(userId)
-      console.log("user", user);
       if (email) {
         // input email
         if (name) {
@@ -117,7 +108,6 @@ export class UserService {
       await this.users.save(user)
       return { user }
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException('CAN NOT UPDATE PROFILE')
     }
   }
@@ -125,13 +115,15 @@ export class UserService {
   async deleteUser(userId: number): Promise<CommonOutPut> {
     try {
       const user = await this.findById(userId)
-      console.log(user);
+      if (!user) {
+        throw new NotFoundException('USER NOT FOUND')
+      }
       this.users.softDelete(user.id)
       return {
         ok: true
       }
     } catch (error) {
-      throw new InternalServerErrorException('INTERNAL SERVER ERROR')
+      throw new NotFoundException(`USER NOT FOUND ID: ${userId}`)
     }
   }
 }

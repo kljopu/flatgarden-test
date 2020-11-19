@@ -37,26 +37,25 @@ describe('AppController (e2e)', () => {
       });
   });
 
-  // it('user create', () => {
-  //   const name = 'hakhak';
-  //   const email = 'kyle103@gmail.com'
-  //   return request(app.getHttpServer())
-  //     .post('/graphql')
-  //     .send({
-  //       query: `mutation {
-  //         createUser(input:{email: "${email}", password: "hakhak", name: "${name}"})
-  //           { ok, error }}`})
-  //     .expect(200)
-  //     .expect(({ body }) => {
-  //       console.log(body.data.createUser);
-  //       expect(body.data.createUser.ok).toBe(true);
-  //       expect(body.data.createUser.error).toBe(null)
-  //     });
-  // });
+  it('user create', () => {
+    const name = 'hakhak';
+    const email = 'test@gmail.com'
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+          createUser(input:{email: "${email}", password: "hakhak", name: "${name}"})
+            { ok, error }}`})
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.data.createUser.ok).toBe(true);
+        expect(body.data.createUser.error).toBe(null)
+      });
+  });
 
   it('user create fail - overlap', () => {
     const name = 'hakhak';
-    const email = 'kyle103@gmail.com'
+    const email = 'test@gmail.com'
     return request(app.getHttpServer())
       .post('/graphql')
       .send({
@@ -70,7 +69,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('user login', () => {
-    const email = 'kyle103@gmail.com'
+    const email = 'test@gmail.com'
     const password = 'hakhak'
     return request(app.getHttpServer())
       .post('/graphql')
@@ -87,7 +86,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('login Faild -wrong password', () => {
-    const email = 'kyle103@gmail.com'
+    const email = 'test@gmail.com'
     const password = "wrongPass"
     return request(app.getHttpServer())
       .post('/graphql')
@@ -104,7 +103,7 @@ describe('AppController (e2e)', () => {
   })
 
   it('login Faild - user does not exists', () => {
-    const email = 'kyle107@gmail.com'
+    const email = 'test1@gmail.com'
     const password = "wrongPass"
     return request(app.getHttpServer())
       .post('/graphql')
@@ -121,7 +120,7 @@ describe('AppController (e2e)', () => {
   })
 
   it('get profile', () => {
-    const email = 'kyle103@gmail.com'
+    const email = 'test@gmail.com'
     return request(app.getHttpServer())
       .post('/graphql')
       .send({
@@ -143,7 +142,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('get profile - Unauthorized', () => {
-    const email = 'kyle103@gmail.com'
+    const email = 'test@gmail.com'
     return request(app.getHttpServer())
       .post('/graphql')
       .send({
@@ -256,7 +255,30 @@ describe('AppController (e2e)', () => {
       .set({ authorization: `Bearer ${token}` })
       .expect(200)
       .expect(({ body }) => {
-        expect(body.data.getAllBoards.boards).toMatchObject([{ "content": "board create", "id": "1", "title": "hakhak test", "author": { "id": "28" } }]);
+        expect(body.data.getAllBoards.boards).toMatchObject([{ "content": "board create", "id": "1", "title": "hakhak test", "author": { "id": "1" } }]);
+      });
+  });
+
+  it('board get all faild - Unauthorized', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+                  getAllBoards{
+                    boards {
+                      id,
+                      title,
+                      content,
+                      author{
+                        id
+                      }
+                    }
+                  }
+                }`,
+      })
+      .set({ authorization: `Bearer wrongToken` })
+      .expect(({ body }) => {
+        expect(body.errors[0].message).toBe('Unauthorized');
       });
   });
 
@@ -281,8 +303,31 @@ describe('AppController (e2e)', () => {
       .set({ authorization: `Bearer ${token}` })
       .expect(200)
       .expect(({ body }) => {
-        console.log(body.data);
         expect(body.data.editMyBoard.boards).toMatchObject({ "content": "edit success", "id": "1", "title": "edit test" });
+      });
+  });
+
+  it('boards edit faild - Unauthorized', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+                  editMyBoard(
+                    input: {
+                      id: 1, title: "edit test", content: "edit success"
+                    })
+                    {
+                    boards {
+                      id,
+                      title,
+                      content
+                    }
+                  }
+                }`,
+      })
+      .set({ authorization: `Bearer wrongToken` })
+      .expect(({ body }) => {
+        expect(body.errors[0].message).toBe('Unauthorized');
       });
   });
 
@@ -299,12 +344,27 @@ describe('AppController (e2e)', () => {
       .set({ authorization: `Bearer ${token}` })
       .expect(200)
       .expect(({ body }) => {
-        console.log(body.data);
         expect(body.data.deleteMyBoard.ok).toBe(true);
       });
   });
 
-  /*
+  it('boards delete faild - Unauthorized', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+                  deleteMyBoard(boardId: 1){
+                    ok
+                  }
+                }`,
+      })
+      .set({ authorization: `Bearer wrongToken` })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.errors[0].message).toBe('Unauthorized');
+      });
+  });
+
   it('edit profile (only name)', () => {
     const newName = "준수"
     return request(app.getHttpServer())
@@ -328,7 +388,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('edit profile (only email)', () => {
-    const newEmail = "kyle101@naver.com"
+    const newEmail = "test100@naver.com"
     return request(app.getHttpServer())
       .post('/graphql')
       .send({
@@ -351,7 +411,7 @@ describe('AppController (e2e)', () => {
 
   it('edit profile (name & email)', () => {
     const newName = "hakhak"
-    const newEmail = 'kyle102@gmail.com'
+    const newEmail = 'test101@gmail.com'
     return request(app.getHttpServer())
       .post('/graphql')
       .send({
@@ -373,6 +433,28 @@ describe('AppController (e2e)', () => {
       });
   });
 
+  it('edit profile faild - Unauthorized', () => {
+    const newName = "hakhak"
+    const newEmail = 'test101@gmail.com'
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+                  editMyProfile(input: {name: "${newName}", email: "${newEmail}"}){
+                    user {
+                      id,
+                      email,
+                      name
+                    }
+                  }
+                }`,
+      })
+      .set({ authorization: `Bearer wrongToken` })
+      .expect(({ body }) => {
+        expect(body.errors[0].message).toBe('Unauthorized')
+      });
+  });
+
   it('delete user', () => {
     return request(app.getHttpServer())
       .post('/graphql')
@@ -383,9 +465,34 @@ describe('AppController (e2e)', () => {
       .set({ authorization: `Bearer ${token}` })
       .expect(200)
       .expect(({ body }) => {
-        console.log(body.data);
         expect(body.data.deleteUser.ok).toBe(true);
       });
   });
-*/
+
+  it('delete user faild -Unauthorized', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+                  deleteUser{ ok }}`,
+      })
+      .set({ authorization: `Bearer wrongToken` })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.errors[0].message).toBe('Unauthorized');
+      });
+  });
+
+  it('delete user faild - User not found', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `mutation {
+                  deleteUser{ ok }}`,
+      })
+      .set({ authorization: `Bearer ${token}` })
+      .expect(({ body }) => {
+        expect(body.errors[0].message).toBe(`USER NOT FOUND ID: 1`);
+      });
+  });
 });

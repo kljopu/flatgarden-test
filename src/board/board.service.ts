@@ -44,8 +44,7 @@ export class BoardService {
       const boards = await this.boards.find({ relations: ['author'] })
       return { boards }
     } catch (error) {
-      console.log(error); 'INTERNAL SERVER ERROR'
-      throw new InternalServerErrorException()
+      throw new InternalServerErrorException('INTERNAL SERVER ERROR')
     }
   }
 
@@ -57,7 +56,6 @@ export class BoardService {
       if (!board) {
         throw new NotFoundException(`NOT FOUND BOARD AT id: ${id}`)
       }
-
       board.title = title
       board.content = content
       this.boards.save(board)
@@ -66,7 +64,6 @@ export class BoardService {
         boards: board
       }
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException('INTERNAL SERVER ERROR')
     }
   }

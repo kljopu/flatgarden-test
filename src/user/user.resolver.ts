@@ -26,9 +26,7 @@ export class UserResolver {
         @Args('input') input: UserProfileInput,
         @GqlUser() user: any
     ): Promise<any> {
-        console.log(input);
         const { email } = input
-        console.log(email);
         return this.userService.getProfile(email)
     }
 
